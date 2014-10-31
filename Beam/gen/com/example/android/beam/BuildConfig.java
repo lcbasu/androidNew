@@ -1,5 +1,5 @@
 /** Automatically generated file. DO NOT MODIFY */
-package info.androidhive.slidingmenu;
+package com.example.android.beam;
 
 public final class BuildConfig {
     public final static boolean DEBUG = true;
