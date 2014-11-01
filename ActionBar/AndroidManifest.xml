@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.basu.androidactionbar"
+    package="com.example.actionbar"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="19"
-        android:targetSdkVersion="19" />
+        android:minSdkVersion="11"
+        android:targetSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -14,14 +14,25 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.basu.androidactionbar.MainActivity"
-            android:label="@string/app_name" >
+            android:name="com.example.actionbar.MainActivity"
+            android:label="@string/app_name"
+            android:uiOptions="splitActionBarWhenNarrow" >
+            <meta-data android:name="android.support.UI_OPTIONS"
+            	android:value="splitActionBarWhenNarrow" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+	        android:name="com.example.actionbar.SecondActivity"
+	        android:label="@string/second_activity_title"
+	        android:parentActivityName="com.example.actionbar.MainActivity" >
+	        <meta-data
+	            android:name="android.support.PARENT_ACTIVITY"
+	            android:value="com.example.actionbar.MainActivity" />
+	    </activity>
     </application>
 
 </manifest>
