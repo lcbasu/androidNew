@@ -10,6 +10,8 @@ public class SecondActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.second_page);
+		
+		//Dialog dateAndTime = new Dialog();
 	}
 
 }
