@@ -1,5 +1,5 @@
 /** Automatically generated file. DO NOT MODIFY */
-package fr.haploid.datetimepicker;
+package com.amal.androidactionbar.app;
 
 public final class BuildConfig {
     public final static boolean DEBUG = true;
