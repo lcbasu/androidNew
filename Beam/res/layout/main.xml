@@ -25,3 +25,12 @@
     android:padding="10dp"
     android:textSize="18sp"
     />
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/textView2"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/info"
+    android:padding="10dp"
+    android:textSize="18sp"
+    />
