@@ -1,5 +1,7 @@
 package com.basu.opengles;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -59,6 +61,17 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 				0.0f, 0.559016994f, 0.0f, 
 				0.0f, 0.0f, 0.0f, 1.0f};
+		
+		/* Initialize the buffers so that Java stores the bytes as native side order */
+		/* This is done because the OpenGL is implemented in C so we need to do so*/
+		mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		mTriangle2Vertices = ByteBuffer.allocateDirect(triangle2VerticesData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		mTriangle3Vertices = ByteBuffer.allocateDirect(triangle3VerticesData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+					
+		/* Here we copy our array into the buffer */
+		mTriangle1Vertices.put(triangle1VerticesData).position(0);
+		mTriangle2Vertices.put(triangle2VerticesData).position(0);
+		mTriangle3Vertices.put(triangle3VerticesData).position(0);
 	}
 
 	@Override
