@@ -7,7 +7,9 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
 
@@ -17,6 +19,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	/* Bytes per float */
 	private final int mBytesPerFloat = 4;
+
+	/*
+	 * Store the view matrix. This can be thought of as our camera.
+	 * This matrix transforms world space to eye space; it positions things relative to our eye.
+	 */
+	private float[] mViewMatrix = new float[16];
 
 	public MyRenderer() {
 
@@ -61,13 +69,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 				0.0f, 0.559016994f, 0.0f, 
 				0.0f, 0.0f, 0.0f, 1.0f};
-		
+
 		/* Initialize the buffers so that Java stores the bytes as native side order */
 		/* This is done because the OpenGL is implemented in C so we need to do so*/
 		mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		mTriangle2Vertices = ByteBuffer.allocateDirect(triangle2VerticesData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		mTriangle3Vertices = ByteBuffer.allocateDirect(triangle3VerticesData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
-					
+
 		/* Here we copy our array into the buffer */
 		mTriangle1Vertices.put(triangle1VerticesData).position(0);
 		mTriangle2Vertices.put(triangle2VerticesData).position(0);
@@ -86,6 +94,32 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
+		
+		/* Sets the background clear color to red. */
+		GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		
+		/* Positioning the eye(camera) behind the origin. */
+		final float eyeX = 0.0f;
+		final float eyeY = 0.0f;
+		final float eyeZ = 1.0f;
+		
+		/* We are looking at towards: */
+		final float lookAtX = 0.0f;
+		final float lookAtY = 0.0f;
+		final float lookAtZ = -5.0f;
+		
+		/* 
+		 * Setting up our UP vector. 
+		 * This is the vector that points in the same direction as our head where we are holding the camera.
+		 */
+		final float upX = 0.0f;
+		final float upY = 1.0f;
+		final float upZ = 0.0f;
+		
+		/* 
+		 * Set the View Matrix.
+		 * This matrix sets the position of the camera(eye).
+		 */
+		Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookAtX, lookAtY, lookAtZ, upX, upY, upZ);
 	}
 }
