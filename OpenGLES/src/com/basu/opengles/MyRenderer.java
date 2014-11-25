@@ -134,5 +134,19 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				+	"	v_Color = a_Color						\n"		/* Passing our color information to the fragment shader. It will be interpolated across the triangle.*/
 				+	"	gl_Position = u_MVPMatrix * a_Posotion;	\n"		/* gl_position is an inbuilt variable which is used to store the actual position. */
 				+	"}											\n";	/* We obtain the final position by multiplying the vertex by the matrix to get the final point in normalized screen coordinates. */
+		
+		/*
+		 * The fragment shader actually put stuff on the screen. 
+		 * In this shader, we grab the varying color from the vertex shader, and just pass it straight through to OpenGL. 
+		 * The point is already interpolated per pixel since the fragment shader runs for each pixel that will be drawn.
+		 */
+		
+		final String fragmentShader = 
+					"uniform mat4 u_MVPMatrix					\n"		/* Set the default precision to medium. We don't need as high of a precision in the fragment shader. */
+				+	"varying vec4 v_Color;						\n"		/* Color from the vertex shader interpolated across the triangle per fragment. */
+				+	"void main()								\n"		/* Entry point for the fragment shader. */
+				+	"{											\n"		
+				+	"	gl_FragColor = v_Color;					\n"		/* gl_FragColor is an inbuilt variable which is used to store the actual color and pass the color directly through the pipeline.*/
+				+	"}											\n";
 	}
 }
