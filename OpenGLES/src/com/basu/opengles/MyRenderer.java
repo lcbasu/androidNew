@@ -148,5 +148,31 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				+	"{											\n"		
 				+	"	gl_FragColor = v_Color;					\n"		/* gl_FragColor is an inbuilt variable which is used to store the actual color and pass the color directly through the pipeline.*/
 				+	"}											\n";
+		
+		/* Loading the vertex shader. */
+		int vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
+		
+		if (vertexShaderHandle != 0) {
+			
+			/* Passing the shader source. */
+			GLES20.glShaderSource(vertexShaderHandle, vertexShader);
+			
+			/* Compiling the shader. */
+			GLES20.glCompileShader(vertexShaderHandle);
+			
+			/* Get the compilation status. */
+			final int compileStatus[] = new int[1];
+			GLES20.glGetShaderiv(vertexShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+			
+			/* Delete the shader if the compilation fails. */
+			if (compileStatus[0] == 0) {
+				GLES20.glDeleteShader(vertexShaderHandle);
+				vertexShaderHandle = 0;
+			}			
+		}
+		
+		if (vertexShaderHandle == 0) {
+			throw new RuntimeException("Error while creating vertex shader.");
+		}
 	}
 }
