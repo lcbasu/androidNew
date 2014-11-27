@@ -174,5 +174,35 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		if (vertexShaderHandle == 0) {
 			throw new RuntimeException("Error while creating vertex shader.");
 		}
+		
+		/* Loading the fragment shader. */
+		int fragmentShaderHandle = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
+		
+		if (fragmentShaderHandle != 0) {
+			
+			/* Passing the shader source. */
+			GLES20.glShaderSource(fragmentShaderHandle, fragmentShader);
+			
+			/* Compiling the shader. */
+			GLES20.glCompileShader(fragmentShaderHandle);
+			
+			/* Get the compilation status. */
+			final int compileStatus[] = new int[1];
+			GLES20.glGetShaderiv(fragmentShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+			
+			/* Delete the shader if the compilation fails. */
+			if (compileStatus[0] == 0) {
+				GLES20.glDeleteShader(fragmentShaderHandle);
+				fragmentShaderHandle = 0;
+			}			
+		}
+		
+		if (fragmentShaderHandle == 0) {
+			throw new RuntimeException("Error while creating fragment shader.");
+		}
+		
+
+		
+		
 	}
 }
