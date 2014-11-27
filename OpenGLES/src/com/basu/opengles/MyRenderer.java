@@ -201,7 +201,36 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			throw new RuntimeException("Error while creating fragment shader.");
 		}
 		
-
+		/* Creates a program object and stores its handle. */
+		int programHandle = GLES20.glCreateProgram();
+		
+		if (programHandle != 0) {
+			
+			/* Bind the vertex shader to the program. */
+			GLES20.glAttachShader(programHandle, vertexShaderHandle);
+			
+			/* Bind the fragment shader to the program. */
+			GLES20.glAttachShader(programHandle, fragmentShaderHandle);
+			
+			/* Binds the attributes. */
+			GLES20.glBindAttribLocation(programHandle, 0, "a_Position");
+			GLES20.glBindAttribLocation(programHandle, 1, "a_Color");
+			
+			/* Links the two shaders together into a program. */
+			GLES20.glLinkProgram(programHandle);
+			
+			/* Retrieve the link status. */
+			final int[] linkStatus = new int[1];
+			GLES20.glGetProgramiv(programHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
+			
+			if (linkStatus[0] == 0) {
+				GLES20.glDeleteProgram(programHandle);
+				programHandle = 0;
+			}
+		}
+		if (programHandle == 0) {
+			throw new RuntimeException("Error while creating program.");
+		}
 		
 		
 	}
