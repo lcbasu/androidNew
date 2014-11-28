@@ -251,7 +251,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		mPosotionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
 		mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
 		
-
+		/* Tells OpenGL to use this program when rendering. */
+		GLES20.glUseProgram(programHandle);
 		
 	}
 }
