@@ -25,6 +25,17 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	 * This matrix transforms world space to eye space; it positions things relative to our eye.
 	 */
 	private float[] mViewMatrix = new float[16];
+	
+	/* This handle is used to pass in the transformation matrix. */
+	private int mMVPMatrixHandel;
+	
+	/* This handle is used to pass in the model position handel. */
+	private int mPosotionHandle;
+	
+	/* This handle is used to pass in the model color information. */
+	private int mColorHandle;
+	
+	
 
 	public MyRenderer() {
 
@@ -232,6 +243,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 			throw new RuntimeException("Error while creating program.");
 		}
 		
+		
+		/* Set the program handles. 
+		 * These are used to pass in the values to the program.
+		 */
+		mMVPMatrixHandel = GLES20.glGetUniformLocation(programHandle, "u_MVPMatrix");
+		mPosotionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
+		mColorHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
+		
+
 		
 	}
 }
