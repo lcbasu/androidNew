@@ -26,6 +26,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	 */
 	private float[] mViewMatrix = new float[16];
 	
+	/* Store the projection matrix.
+	 * Used to project scene into 2D view port.
+	 */
+	private float[] mProjectionMatrix = new float[16];
+	
 	/* This handle is used to pass in the transformation matrix. */
 	private int mMVPMatrixHandel;
 	
@@ -100,7 +105,20 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
+		
+		/* Sets the OpenGL viewport to the same size as the screen surface. */
+		GLES20.glViewport(0, 0, width, height);
 
+		/* Creates a perspective projection matrix. */
+		final float ratio = (float) width/height;
+		final float left = -ratio;
+		final float right = ratio;
+		final float bottom = -1.0f;
+		final float top = 1.0f;
+		final float near = 1.0f;
+		final float far = 10.0f;
+		
+		Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
 	}
 
 	@Override
