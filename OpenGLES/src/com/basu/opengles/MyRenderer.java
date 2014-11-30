@@ -7,9 +7,11 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.graphics.YuvImage;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
 
@@ -41,6 +43,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	private int mColorHandle;
 	
 	
+	/* Store the model matrix. 
+	 * This matrix is used to move models from object space (where each model can be thought of being located at the center of the universe) to world space.
+     */
+	private float[] mModelMatrix = new float[16];
 
 	public MyRenderer() {
 
@@ -100,7 +106,21 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
+		
+		/* Clears the screen and sets double buffer and color buffer.  */
+		GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+		
+		/* Rotation of the triangle every 10 second. */
+		long time = SystemClock.uptimeMillis() % 10000L;
+		float angleInDegrees = (360.0f / 1000.0f) * ((int) time);
+		
+		/* Draw the triangle with straight face on. */
+		Matrix.setIdentityM(mModelMatrix, 0);
+		Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 0.0f);
+		drawTriangle(mTriangle1Vertices);
+	}
 
+	private void drawTriangle(FloatBuffer mTriangle1Vertices2) {		
 	}
 
 	@Override
