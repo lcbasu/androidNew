@@ -36,6 +36,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	/* This handle is used to pass in the transformation matrix. */
 	private int mMVPMatrixHandel;
 
+	/* 
+	 * Stores a copy of the model matrix specifically for the light position.
+	 */
+	private float[] mLightModelMatrix = new float[16];
+
+
 	/* This handle is used to pass in the model position handel. */
 	private int mPosotionHandle;
 
@@ -237,20 +243,20 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 		/* Shader */
 
-//		final String vertexShader = 
-//				"uniform mat4 u_MVPMatrix;      				\n"		/* A constant representing the combined Model-View-Projection matrix. */
-//				+	"attribute vec4 a_Position;					\n"		/* Per-vertex position information that will be passed in by us. */
-//				+	"attribute vec4 a_Color;					\n"		/* Per-vertex color information that will be passed in by us. */
-//
-//				+	"varying vec4 v_Color;						\n"		/* This variable will be passed into the fragment shader.*/
-//
-//				+	"void main()								\n"		/* Entry point for the vertex shader. */
-//				+	"{											\n"		
-//				+	"	v_Color = a_Color;						\n"		/* Passing our color information to the fragment shader. It will be interpolated across the triangle.*/
-//
-//				+	"	gl_Position = u_MVPMatrix * a_Posotion;	\n"		/* gl_position is an inbuilt variable which is used to store the actual position. */
-//
-//				+	"}											\n";	/* We obtain the final position by multiplying the vertex by the matrix to get the final point in normalized screen coordinates. */
+		//		final String vertexShader = 
+		//				"uniform mat4 u_MVPMatrix;      				\n"		/* A constant representing the combined Model-View-Projection matrix. */
+		//				+	"attribute vec4 a_Position;					\n"		/* Per-vertex position information that will be passed in by us. */
+		//				+	"attribute vec4 a_Color;					\n"		/* Per-vertex color information that will be passed in by us. */
+		//
+		//				+	"varying vec4 v_Color;						\n"		/* This variable will be passed into the fragment shader.*/
+		//
+		//				+	"void main()								\n"		/* Entry point for the vertex shader. */
+		//				+	"{											\n"		
+		//				+	"	v_Color = a_Color;						\n"		/* Passing our color information to the fragment shader. It will be interpolated across the triangle.*/
+		//
+		//				+	"	gl_Position = u_MVPMatrix * a_Posotion;	\n"		/* gl_position is an inbuilt variable which is used to store the actual position. */
+		//
+		//				+	"}											\n";	/* We obtain the final position by multiplying the vertex by the matrix to get the final point in normalized screen coordinates. */
 
 		final String vertexShader =
 				"uniform mat4 u_MVPMatrix;      \n"		// A constant representing the combined model/view/projection matrix.
