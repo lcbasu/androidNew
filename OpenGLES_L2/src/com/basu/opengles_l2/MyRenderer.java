@@ -14,11 +14,12 @@ import android.opengl.Matrix;
 import android.os.SystemClock;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
-
-	private FloatBuffer mTriangle1Vertices;
-	private FloatBuffer mTriangle2Vertices;
-	private FloatBuffer mTriangle3Vertices;
-
+	
+	/* Store our model data in a float buffer. */
+	private final FloatBuffer mCubePositions;
+	private final FloatBuffer mCubeColors;
+	private final FloatBuffer mCubeNormals;
+	
 	/* Bytes per float */
 	private final int mBytesPerFloat = 4;
 
@@ -227,6 +228,16 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				0.0f, -1.0f, 0.0f,
 				0.0f, -1.0f, 0.0f
 			};
+		
+		/* Initialize the buffers. */
+		mCubePositions = ByteBuffer.allocateDirect(cubePositionData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		mCubePositions.put(cubePositionData).position(0);		
+		
+		mCubeColors = ByteBuffer.allocateDirect(cubeColorData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();							
+		mCubeColors.put(cubeColorData).position(0);
+		
+		mCubeNormals = ByteBuffer.allocateDirect(cubeNormalData.length * mBytesPerFloat).order(ByteOrder.nativeOrder()).asFloatBuffer();							
+		mCubeNormals.put(cubeNormalData).position(0);
 	}
 
 	@Override
