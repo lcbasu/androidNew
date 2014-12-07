@@ -7,11 +7,10 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.graphics.YuvImage;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
+import android.util.Log;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
 
@@ -54,6 +53,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	 * This matrix is used to move models from object space (where each model can be thought of being located at the center of the universe) to world space.
 	 */
 	private float[] mModelMatrix = new float[16];
+
+	/* This is a handle to our light point program. */
+	private int mPointProgramHandle;
+
+	/* This is a handle to our per-vertex cube shading program. */
+	private int mPerVertexProgramHandle;
+
 
 	/*
 	 * Initialize the model data.
@@ -245,7 +251,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	protected String getVertexShader()
 	{
 		final String vertexShader =
-					"uniform mat4 u_MVPMatrix;      \n"		/* A constant representing the combined model/view/projection matrix. */				+ 	"uniform mat4 u_MVMatrix;       \n"		// A constant representing the combined model/view matrix.	
+				"uniform mat4 u_MVPMatrix;      \n"		/* A constant representing the combined model/view/projection matrix. */				+ 	"uniform mat4 u_MVMatrix;       \n"		// A constant representing the combined model/view matrix.	
 				+ 	"uniform vec3 u_LightPos;       \n"	    /* The position of the light in eye space. */
 				+ 	"attribute vec4 a_Position;     \n"		/* Per-vertex position information we will pass in. */
 				+ 	"attribute vec4 a_Color;        \n"		/* Per-vertex color information we will pass in. */
@@ -278,12 +284,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		return vertexShader;
 	}
 
-	
+
 	/* Fragment shader. */
 	protected String getFragmentShader()
 	{
 		final String fragmentShader =
-					"precision mediump float;       \n"		/* Set the default precision to medium. We don't need as high of a precision in the fragment shader. */
+				"precision mediump float;       \n"		/* Set the default precision to medium. We don't need as high of a precision in the fragment shader. */
 				+ 	"varying vec4 v_Color;          \n"		/* This is the color from the vertex shader interpolated across the triangle per fragment. */
 				+ 	"void main()                    \n"		/* The entry point for our fragment shader. */
 				+ 	"{                              \n"
@@ -301,10 +307,166 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
+		/* Set the background clear color to black. */
+		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+		/* Use culling to remove back faces. */
+		GLES20.glEnable(GLES20.GL_CULL_FACE);
+
+		/* Enable depth testing. */
+		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+
+		/* Position the eye in front of the origin. */
+		final float eyeX = 0.0f;
+		final float eyeY = 0.0f;
+		final float eyeZ = -0.5f;
+
+		/* We are looking toward the distance. */
+		final float lookX = 0.0f;
+		final float lookY = 0.0f;
+		final float lookZ = -5.0f;
+
+		/* Set our up vector. This is where our head would be pointing were we holding the camera. */
+		final float upX = 0.0f;
+		final float upY = 1.0f;
+		final float upZ = 0.0f;
+
+		/* Set the view matrix. This matrix can be said to represent the camera position.
+		 * NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
+		 * view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
+		 */
+		Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);		
+
+		final String vertexShader = getVertexShader();   		
+		final String fragmentShader = getFragmentShader();			
+
+		final int vertexShaderHandle = compileShader(GLES20.GL_VERTEX_SHADER, vertexShader);		
+		final int fragmentShaderHandle = compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShader);		
+
+		mPerVertexProgramHandle = createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle, 
+				new String[] {"a_Position",  "a_Color", "a_Normal"});								                                							       
+
+		/* Define a simple shader program for our point. */
+		final String pointVertexShader =
+				 			"uniform mat4 u_MVPMatrix;      \n"		
+						 +	"attribute vec4 a_Position;     \n"		
+						 + "void main()                    \n"
+						 + "{                              \n"
+						 + "   gl_Position = u_MVPMatrix   \n"
+						 + "               * a_Position;   \n"
+						 + "   gl_PointSize = 5.0;         \n"
+						 + "}                              \n";
+
+		 final String pointFragmentShader = 
+				 		   "precision mediump float;       \n"					          
+						 + "void main()                    \n"
+						 + "{                              \n"
+						 + "   gl_FragColor = vec4(1.0,    \n" 
+						 + "   1.0, 1.0, 1.0);             \n"
+						 + "}                              \n";
+
+		 final int pointVertexShaderHandle = compileShader(GLES20.GL_VERTEX_SHADER, pointVertexShader);
+		 final int pointFragmentShaderHandle = compileShader(GLES20.GL_FRAGMENT_SHADER, pointFragmentShader);
+		 mPointProgramHandle = createAndLinkProgram(pointVertexShaderHandle, pointFragmentShaderHandle, new String[] {"a_Position"}); 
 	}
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
 	}
+
+	/** 
+	 * Helper function to compile a shader.
+	 * 
+	 * @param shaderType The shader type.
+	 * @param shaderSource The shader source code.
+	 * @return An OpenGL handle to the shader.
+	 */
+	private int compileShader(final int shaderType, final String shaderSource) 
+	{
+		int shaderHandle = GLES20.glCreateShader(shaderType);
+
+		if (shaderHandle != 0) 
+		{
+			// Pass in the shader source.
+			GLES20.glShaderSource(shaderHandle, shaderSource);
+
+			// Compile the shader.
+			GLES20.glCompileShader(shaderHandle);
+
+			// Get the compilation status.
+			final int[] compileStatus = new int[1];
+			GLES20.glGetShaderiv(shaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+
+			// If the compilation failed, delete the shader.
+			if (compileStatus[0] == 0) 
+			{
+				Log.e("Compile Status", "Error compiling shader: " + GLES20.glGetShaderInfoLog(shaderHandle));
+				GLES20.glDeleteShader(shaderHandle);
+				shaderHandle = 0;
+			}
+		}
+
+		if (shaderHandle == 0)
+		{			
+			throw new RuntimeException("Error creating shader.");
+		}
+
+		return shaderHandle;
+	}	
+
+	/**
+	 * Helper function to compile and link a program.
+	 * 
+	 * @param vertexShaderHandle An OpenGL handle to an already-compiled vertex shader.
+	 * @param fragmentShaderHandle An OpenGL handle to an already-compiled fragment shader.
+	 * @param attributes Attributes that need to be bound to the program.
+	 * @return An OpenGL handle to the program.
+	 */
+	private int createAndLinkProgram(final int vertexShaderHandle, final int fragmentShaderHandle, final String[] attributes) 
+	{
+		int programHandle = GLES20.glCreateProgram();
+
+		if (programHandle != 0) 
+		{
+			// Bind the vertex shader to the program.
+			GLES20.glAttachShader(programHandle, vertexShaderHandle);			
+
+			// Bind the fragment shader to the program.
+			GLES20.glAttachShader(programHandle, fragmentShaderHandle);
+
+			// Bind attributes
+			if (attributes != null)
+			{
+				final int size = attributes.length;
+				for (int i = 0; i < size; i++)
+				{
+					GLES20.glBindAttribLocation(programHandle, i, attributes[i]);
+				}						
+			}
+
+			// Link the two shaders together into a program.
+			GLES20.glLinkProgram(programHandle);
+
+			// Get the link status.
+			final int[] linkStatus = new int[1];
+			GLES20.glGetProgramiv(programHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
+
+			// If the link failed, delete the program.
+			if (linkStatus[0] == 0) 
+			{				
+				Log.e("Link Status", "Error compiling program: " + GLES20.glGetProgramInfoLog(programHandle));
+				GLES20.glDeleteProgram(programHandle);
+				programHandle = 0;
+			}
+		}
+
+		if (programHandle == 0)
+		{
+			throw new RuntimeException("Error creating program.");
+		}
+
+		return programHandle;
+	}
+
 }
