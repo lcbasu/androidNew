@@ -319,7 +319,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		/* Position the eye in front of the origin. */
 		final float eyeX = 0.0f;
 		final float eyeY = 0.0f;
-		final float eyeZ = -0.5f;
+		final float eyeZ = -1.0f;
 
 		/* We are looking toward the distance. */
 		final float lookX = 0.0f;
@@ -354,7 +354,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 						 + "{                              \n"
 						 + "   gl_Position = u_MVPMatrix   \n"
 						 + "               * a_Position;   \n"
-						 + "   gl_PointSize = 5.0;         \n"
+						 + "   gl_PointSize = 8.0;         \n"
 						 + "}                              \n";
 
 		 final String pointFragmentShader = 
