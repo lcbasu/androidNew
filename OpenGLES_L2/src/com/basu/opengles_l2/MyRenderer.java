@@ -274,7 +274,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 				/* Attenuate the light based on distance.*/
 				+ 	"   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
 				/* Multiply the color by the illumination level. It will be interpolated across the triangle.*/
-				+ 	"   v_Color = a_Color * diffuse;                                       \n" 	 
+				+ 	"   v_Color = a_Color * diffuse * 0.8;                                       \n" 	// 0.8 for opacity 
 				/* gl_Position is a special variable used to store the final position. 
 				 * Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
 				 */
